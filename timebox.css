@@ -1,0 +1,72 @@
+#timebox.show-timebox {
+    display: flex;
+    transition: all 1s;
+}
+
+#timebox.hide-timebox  {
+    display: flex;
+    opacity: 0;
+    transition: all 1s;
+}
+
+#time {
+    margin-left: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+#status {
+    margin-top: 0px;
+    margin-right: 0 ;
+    margin-bottom: 0;
+    z-index: 999;
+}
+
+#day,#hour,#activity1,#activity2 {
+    margin-top: 0px;
+    margin-right: 0 ;
+    margin-left: auto;
+    margin-bottom: 0;
+    z-index: 999;
+
+}
+
+#discord {
+    display: flex;
+    align-items: center;
+    z-index: 999;
+}
+
+
+
+
+svg {
+    width: 16px;
+    height: 16px;
+    margin-left: auto;
+    margin-right: 4px;
+    pointer-events: all;
+    z-index: 999;
+}
+
+path {
+    z-index: 999;
+}
+
+
+
+#activity1.show-activity,#activity2.show-activity {
+    opacity: 0.5;
+}
+
+#activity1.hide-activity,#activity2.hide-activity{
+    opacity: 0;
+}
+
+
+@media only screen and (max-width : 700px) {
+    #timebox {
+        opacity: 0;
+    
+  }
+}

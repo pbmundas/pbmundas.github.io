@@ -1,0 +1,296 @@
+/* GLOBAL STYLES */
+
+
+
+.notch:not(.moving):hover {
+    width: 17px;
+    height: 17px;
+    transition: all 0.2s; /* does not work after the animation for some obscure reason ? */
+}
+
+
+
+
+
+@media only screen and (max-width : 440px) {
+    .notch {
+        margin-left: -2px;
+    }
+
+      
+}
+
+@media only screen and (max-width : 400px) {
+    .notch {
+        margin-left: -4px;
+    }
+    
+}
+
+@media only screen and (max-width : 376px) {
+    .notch {
+        margin-left: -5px;
+    
+    }
+
+}
+
+
+/* SHOWING STYLES */
+
+
+
+#tooltip {
+    padding-bottom: 8px;
+
+}
+
+#floating {
+    position: fixed;
+    left: 50%;
+    bottom: 10px;
+    transform: translate(-50%, -50%);
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 0;
+}
+
+#iconbar {
+    border-radius: 7px;
+    border-radius: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(50px);
+    -webkit-backdrop-filter: blur(50px);
+    opacity: 0.7;
+    padding: 10px;
+    transition: all 0.1s;
+    cursor: pointer
+
+}
+
+.notch {
+    width: 15px;
+    height: 15px;
+    padding: 3px 0px 0px 2px;
+    transition: all 0.2s;
+    opacity: 1;
+}
+
+
+
+/* HIDING ANIMATIONS */
+
+
+
+@keyframes hidenotch {
+    0% {
+        visibility: visible;
+        opacity: 1;
+    }
+    25% {
+        opacity: 0;
+        width: 15px;
+        height: 15px;
+
+    }
+    50% {
+        visibility: hidden;
+        width: 0px;
+        height: 0px;
+        opacity: 0;
+    }
+    75% {
+        visibility: hidden;
+        width: 0px;
+        height: 0px;
+        opacity: 0;
+    }
+    100% {
+        visibility: hidden;
+        width: 0px;
+        height: 0px;
+        opacity: 0;
+    }
+}
+
+@keyframes hide {
+    0% {
+    }
+    25% {
+        width: 250px;
+    }
+    50% {
+        width: 117px;
+        bottom: 10px;
+    }
+    75% {
+        bottom: -15px;
+    }
+    100% {
+        bottom: -15px;
+    }
+}
+
+@keyframes hidebar {
+    0% {
+    }
+    25% {
+    }
+    50% {
+        height: 19px;
+    }
+    75% {
+        height: 3px;
+    }
+    100% {
+        height: 3px;
+    }
+}
+
+@keyframes hidetooltip {
+    0% {
+    }
+    25% {
+    }
+    50% {
+        opacity: 1;
+    }
+    75% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+
+
+/* SHOWING ANIMATIONS */
+
+
+
+@keyframes shownotch {
+    0% {
+        visibility: hidden;
+        width: 0px;
+        height: 0px;
+        opacity: 0;
+    }
+    25% {
+        visibility: hidden;
+        width: 15px;
+        height: 15px;
+        opacity: 0;
+    }
+    50% {
+        visibility: visible;
+        opacity: 1;
+    }
+    75% {
+
+    }
+    100% {
+    }
+}
+
+@keyframes show {
+    0% {
+        bottom: -15px;
+    }
+    25% {
+        bottom: 10px;
+        width: 250px;
+    }
+    50% {
+    }
+    75% {
+    }
+    100% {
+    }
+}
+
+@keyframes showbar {
+    0% {
+        height: 3px;
+    }
+    25% {
+        height: 19px;
+    }
+    50% {
+    }
+    75% {
+    }
+    100% {
+    }
+}
+
+@keyframes showtooltip {
+    0% {
+        opacity: 0;
+    }
+    25% {
+        opacity: 1;
+    }
+    50% {
+    }
+    75% {
+    }
+    100% {
+    }
+}
+
+
+#iconbar.hide-menu {
+    animation: hidebar 2s;
+    animation-fill-mode: forwards;
+}
+
+#iconbar.show-menu {
+    animation: showbar 2s;
+    animation-fill-mode: forwards;
+}
+
+#tooltip.hide-menu {
+    animation: hidetooltip 2s;
+    animation-fill-mode: forwards;
+}
+
+#tooltip.show-menu {
+    animation: showtooltip 2s;
+    animation-fill-mode: forwards;
+}
+
+#floating.hide-menu {
+    animation: hide 2s;
+    animation-fill-mode: forwards;
+}
+
+#floating.show-menu {
+    animation: show 2s;
+    animation-fill-mode: forwards;
+}
+
+.notch.hide-menu {
+    animation: hidenotch 2s;
+    animation-fill-mode: forwards;
+}
+
+.notch.show-menu {
+    animation: shownotch 2s;
+    animation-fill-mode: forwards;
+}
+
+
+.unselectable {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent
+}

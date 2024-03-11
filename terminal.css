@@ -1,0 +1,90 @@
+body {
+    font-family: cursor, monospace;
+    font-size: 16px;
+    padding: 20px;
+}
+
+
+#terminal {
+    position: fixed;
+    overflow: auto;
+    margin: 0 auto;
+    max-height: 92vh;
+    width: 190vw;
+}
+
+#commandLine {
+    display: flex;
+    align-items: center;
+  }
+
+#commandLine input[type="text"] {
+    flex: 1;
+    margin-left: 5px;
+    font-family: cursor, monospace;
+    border: none;
+    outline: none;
+    font-size: 16px;
+}
+
+
+#commandDisplay {
+  width: 100%;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  display: block;
+  min-width: 0;
+}
+
+#underline {
+  text-decoration: underline;
+
+}
+
+a {
+  all: unset;
+  cursor: pointer;
+}
+
+pre {
+  line-height: 0px;
+}
+
+@media only screen and (max-width : 1400px) {
+  #commandDisplay {
+    width: 50%;
+  }
+
+  #terminal {
+    max-height: 90vh;
+  }
+
+
+  
+}
+
+@media only screen and (max-width : 500px) {
+  body {
+    font-size: 15px;
+    padding: 10px;
+  }
+  pre {
+    font-size: 12px;
+  }
+}
+
+@media only screen and (max-width : 450px) {
+  pre {
+    font-size: 11px;
+  }
+}
+
+@media only screen and (max-width : 400px) {
+  body {
+    font-size: 14px;
+    padding: 5px;
+  }
+  pre {
+    font-size: 10px;
+  }
+}
