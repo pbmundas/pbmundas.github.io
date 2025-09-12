@@ -84,7 +84,7 @@ Welcome to Kali Linux Terminal Emulator!
 Type 'help' for available commands.
         </div>
         <div id="input-line">
-            <span id="prompt">kali@kali:~$ </span>
+            <span id="prompt">user@kali:~$ </span>
             <input type="text" id="command" autofocus placeholder="Enter command...">
         </div>
     </div>
@@ -105,11 +105,11 @@ Type 'help' for available commands.
   exit     - Exit the terminal (reloads page)
   
 Link commands:
-  blog     - Open personal blog
-  linkedin - Open LinkedIn profile
-  whatsapp - Open WhatsApp Web
-  website  - Open personal website
-  mobile   - Display contact info
+  blog     
+  linkedin 
+  whatsapp 
+  website  
+  mobile   
   
 Add custom commands using addCommand('name', function(args) { return 'output'; });`;
             },
@@ -150,24 +150,24 @@ Videos/`;
             },
             // Link-based commands (automatically open in new tab; replace URLs with your actual links)
             'blog': () => {
-                window.open('https://your-blog.com', '_blank');
+                window.open('https://readsecurity.wordpress.com', '_blank');
                 return `Opening blog in new tab...`;
             },
             'linkedin': () => {
-                window.open('https://www.linkedin.com/in/your-profile', '_blank');
+                window.open('https://www.linkedin.com/in/prasannamundas/', '_blank');
                 return `Opening LinkedIn profile in new tab...`;
             },
             'whatsapp': () => {
-                window.open('https://web.whatsapp.com/', '_blank');
+                window.open('https://api.whatsapp.com/send/?phone=919886120777&text=Hello%20Prasanna&type=phone_number&app_absent=0', '_blank');
                 return `Opening WhatsApp Web in new tab...`;
             },
             'website': () => {
-                window.open('https://your-website.com', '_blank');
+                window.open('https://pbmundas.github.io', '_blank');
                 return `Opening personal website in new tab...`;
             },
             'mobile': () => {
-                return `Contact: +1-123-456-7890 (Click to call via tel: link if on mobile)
-<a href="tel:+11234567890" class="link">Click here to call</a>`;
+                return `Contact: +1-9886120777 (Click to call via tel: link if on mobile)
+<a href="tel:+919886120777" class="link">Click here to call</a>`;
             }
         };
 
@@ -201,7 +201,7 @@ Videos/`;
                 const cmdLine = this.value.trim();
                 if (cmdLine) {
                     // Append command to output
-                    appendToOutput(`kali@kali:~$ ${cmdLine}`);
+                    appendToOutput(`user@kali:~$ ${cmdLine}`);
 
                     // Parse command
                     const parts = cmdLine.split(/\s+/);
