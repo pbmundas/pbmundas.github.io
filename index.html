@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kali Linux Terminal Emulator</title>
+    <title>Kali Linux Terminal Emulator with Image</title>
     <style>
         body {
             margin: 0;
@@ -12,36 +12,59 @@
             color: #ffffff;
             font-family: 'Courier New', Courier, monospace;
             font-size: 14px;
+            display: flex;
+            height: 100vh;
             overflow: hidden;
         }
-        
+
+        #container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+
         #terminal {
+            width: 50%;
             height: 100vh;
-            width: 100vw;
             padding: 10px;
             box-sizing: border-box;
             overflow-y: auto;
             background-color: #000000;
         }
-        
+
+        #image-container {
+            width: 50%;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #000000;
+        }
+
+        #image-container img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
         #output {
             white-space: pre-wrap;
             line-height: 1.4;
             margin-bottom: 10px;
             color: #ffffff;
         }
-        
+
         #input-line {
             display: flex;
             align-items: center;
             margin: 0;
         }
-        
+
         #prompt {
             color: #ffffff;
             white-space: pre;
         }
-        
+
         #command {
             background: transparent;
             border: none;
@@ -52,23 +75,23 @@
             flex-grow: 1;
             caret-color: #ffffff;
         }
-        
+
         #command::placeholder {
             color: #808080;
         }
-        
+
         .error {
             color: #ff0000;
         }
-        
+
         .success {
             color: #00ff00;
         }
-        
+
         .info {
             color: #00ffff;
         }
-        
+
         .link {
             color: #ff00ff;
             text-decoration: underline;
@@ -77,22 +100,26 @@
     </style>
 </head>
 <body>
-    <div id="terminal">
-        <div id="output">
+    <div id="container">
+        <div id="terminal">
+            <div id="output">
 Welcome to Kali Linux Terminal Emulator!
 
 Type 'help' for available commands.
+            </div>
+            <div id="input-line">
+                <span id="prompt">user@kali:~$ </span>
+                <input type="text" id="command" autofocus placeholder="Enter command...">
+            </div>
         </div>
-        <div id="input-line">
-            <span id="prompt">user@kali:~$ </span>
-            <input type="text" id="command" autofocus placeholder="Enter command...">
+        <div id="image-container">
+            <img src="https://github.com/pbmundas/pbmundas.github.io/blob/3efa06c3cd15b880a79f01e80449108bda8224c1/Prasannamundaskali.png" alt="Placeholder Image">
         </div>
     </div>
 
     <script>
         // Command registry: An object to hold all commands as functions
         const commands = {
-            // Built-in basic commands
             'help': () => {
                 return `Available commands:
   help     - Show this help message
@@ -151,7 +178,6 @@ Videos/`;
                 }
                 return ''; // No output if not exiting
             },
-            // Link-based commands (automatically open in new tab; replace URLs with your actual links)
             'attacks': () => {
                 window.open('https://pbmundas.github.io/know-attacks-history/', '_blank');
                 return `Opening Attack Navigator in new tab...`;
@@ -186,8 +212,6 @@ Videos/`;
             }
         };
 
-        // Function to add custom commands from HTML/JS code
-        // Usage: addCommand('mycommand', (args) => { return 'Custom output: ' + args.join(' '); });
         function addCommand(name, func) {
             if (typeof func !== 'function') {
                 throw new Error('Custom command must be a function that takes args array and returns output string.');
@@ -196,29 +220,21 @@ Videos/`;
             appendToOutput(`Custom command '${name}' added successfully.`, 'success');
         }
 
-        // Example custom command (uncomment or modify as needed for portfolio demo)
-        // addCommand('hello', (args) => `Hello, ${args[0] || 'World'}! This is a custom command.`);
-
-        // Helper function to append output to terminal
         function appendToOutput(text, className = '') {
             const output = document.getElementById('output');
             const line = document.createElement('div');
             line.className = className;
-            line.innerHTML = text; // Use innerHTML to support links
+            line.innerHTML = text;
             output.appendChild(line);
             output.scrollTop = output.scrollHeight;
         }
 
-        // Input handling
         const commandInput = document.getElementById('command');
         commandInput.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
                 const cmdLine = this.value.trim();
                 if (cmdLine) {
-                    // Append command to output
                     appendToOutput(`user@kali:~$ ${cmdLine}`);
-
-                    // Parse command
                     const parts = cmdLine.split(/\s+/);
                     const cmd = parts[0].toLowerCase();
                     const args = parts.slice(1);
@@ -239,29 +255,25 @@ Videos/`;
                         appendToOutput(`bash: ${cmd}: command not found`, 'error');
                     }
 
-                    // Clear input
                     this.value = '';
                 }
             } else if (e.key === 'Tab') {
                 e.preventDefault();
-                // Simple tab completion (basic: suggest 'ls' or 'help' if empty)
                 if (this.value.trim() === '') {
                     this.value = 'ls ';
                 }
             }
         });
 
-        // Focus input on any click in the terminal
         document.addEventListener('click', function(e) {
             commandInput.focus();
         });
 
-        // Auto-focus on input initially
         commandInput.focus();
 
-        // Handle window resize to keep terminal full-screen
         window.addEventListener('resize', () => {
             document.getElementById('terminal').style.height = '100vh';
+            document.getElementById('image-container').style.height = '100vh';
         });
     </script>
 </body>
