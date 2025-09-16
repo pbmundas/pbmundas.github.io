@@ -33,13 +33,15 @@
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
-            min-width: 200px; /* Minimum width to prevent collapse */
+            min-width: 200px;
         }
 
         #terminal {
             flex-grow: 1;
             padding: 10px;
-            background-color: #2e3436;
+            background: linear-gradient(rgba(46, 52, 54, 0.7), rgba(46, 52, 54, 0.7)), 
+                        url('https://raw.githubusercontent.com/pbmundas/pbmundas.github.io/refs/heads/main/Prasannamundaskali.png') no-repeat center center;
+            background-size: cover;
             border: 2px solid #4f5b62;
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
@@ -47,6 +49,7 @@
             overflow-x: hidden;
             word-wrap: break-word;
             word-break: break-all;
+            position: relative;
         }
 
         #terminal-header {
@@ -87,7 +90,7 @@
             align-items: center;
             background-color: #000000;
             overflow: hidden;
-            min-width: 200px; /* Minimum width to prevent collapse */
+            min-width: 200px;
         }
 
         #image-container img {
@@ -195,6 +198,51 @@ Type 'help' for available commands.
     </div>
 
     <script>
+        // Simulated filesystem
+        let filesystem = {
+            '/home/kali': {
+                type: 'dir',
+                contents: {
+                    'Desktop': { type: 'dir', contents: {} },
+                    'Documents': { type: 'dir', contents: {} },
+                    'Downloads': { type: 'dir', contents: {} },
+                    'Music': { type: 'dir', contents: {} },
+                    'Pictures': { type: 'dir', contents: {} },
+                    'Templates': { type: 'dir', contents: {} },
+                    'Videos': { type: 'dir', contents: {} },
+                    '.bash_logout': { type: 'file', contents: 'Logout script' },
+                    '.bashrc': { type: 'file', contents: 'Bash configuration' },
+                    '.profile': { type: 'file', contents: 'User profile' }
+                }
+            }
+        };
+        let currentPath = '/home/kali';
+
+        // Helper function to resolve path
+        function resolvePath(path) {
+            if (!path) return currentPath;
+            let absolute = path.startsWith('/') ? path : `${currentPath}/${path}`;
+            absolute = absolute.replace(/\/+/g, '/').replace(/\/$/, '');
+            if (absolute === '') absolute = '/';
+            return absolute;
+        }
+
+        // Helper function to get directory at path
+        function getDir(path) {
+            const parts = resolvePath(path).split('/').filter(p => p);
+            let dir = filesystem;
+            if (path === '/') return dir;
+            for (let part of parts) {
+                dir = dir['/home/kali']?.contents || dir;
+                if (dir[part]?.type === 'dir') {
+                    dir = dir[part].contents;
+                } else {
+                    return null;
+                }
+            }
+            return dir;
+        }
+
         // Command registry
         const commands = {
             'help': () => {
@@ -207,7 +255,7 @@ Type 'help' for available commands.
   clear    - Clear the terminal screen
   date     - Show current date
   exit     - Exit the terminal (reloads page)
-  
+ 
 Link commands:
   attacks
   hunting
@@ -217,25 +265,33 @@ Link commands:
   whatsapp 
   website  
   mobile   
-  
 
             },
             'ls': (args) => {
-                const dir = args[0] || '';
-                if (dir === '-l') {
-                    return `total 48
-drwxr-xr-x  5 kali kali  4096 Sep 12 10:00 .
-drwxr-xr-x  3 root root  4096 Sep 12 09:00 ..
--rw-r--r--  1 kali kali  2201 Jan  6  2024 .bash_logout
--rw-r--r--  1 kali kali  3771 Jan  6  2024 .bashrc
--rw-r--r--  1 kali kali   807 Jan  6  2024 .profile
-drwxr-xr-x  2 kali kali  4096 Sep 12 10:00 Desktop
-drwxr-xr-x  2 kali kali  4096 Sep 12 09:00 Documents
-drwxr-xr-x  2 kali kali  4096 Sep 12 09:00 Downloads`;
+                const dir = getDir(args[0] || currentPath);
+                if (!dir) return `[-] ls: cannot access '${args[0] || currentPath}': No such file or directory`;
+                if (args[0] === '-l') {
+                    let output = 'total 48\n';
+                    const entries = Object.entries(filesystem['/home/kali'].contents);
+                    entries.forEach(([name, info]) => {
+                        const type = info.type === 'dir' ? 'drwxr-xr-x' : '-rw-r--r--';
+                        output += `${type}  1 kali kali  4096 Sep 12 10:00 ${name}\n`;
+                    });
+                    return output;
                 }
-                return `Desktop  Documents  Downloads  Music  Pictures  Templates  Videos`;
+                return Object.keys(dir).join('  ');
             },
-            'pwd': () => '/home/kali',
+            'cd': (args) => {
+                const target = args[0] || '/home/kali';
+                const resolvedPath = resolvePath(target);
+                if (resolvedPath === '/home/kali' || getDir(resolvedPath)) {
+                    currentPath = resolvedPath;
+                    document.getElementById('prompt').innerText = `┌──(kali㉿kali)-[${currentPath.replace('/home/kali', '~')}]\n└─$ `;
+                    return '';
+                }
+                return `[-] cd: ${target}: No such file or directory`;
+            },
+            'pwd': () => currentPath,
             'whoami': () => {
                 window.open('https://www.linkedin.com/in/prasannamundas/', '_blank');
                 return ``;
@@ -251,6 +307,250 @@ drwxr-xr-x  2 kali kali  4096 Sep 12 09:00 Downloads`;
                     location.reload();
                 }
                 return '';
+            },
+            'cat': (args) => {
+                if (!args[0]) {
+                    return `[-] cat: missing file operand\nTry 'cat --help' for more information.`;
+                }
+                const path = resolvePath(args[0]);
+                const parts = path.split('/').filter(p => p);
+                let dir = filesystem;
+                let fileName = parts.pop();
+                for (let part of parts) {
+                    dir = dir['/home/kali']?.contents || dir;
+                    if (dir[part]?.type === 'dir') {
+                        dir = dir[part].contents;
+                    } else {
+                        return `[-] cat: ${args[0]}: No such file or directory`;
+                    }
+                }
+                if (dir[fileName]?.type === 'file') {
+                    return dir[fileName].contents;
+                }
+                return `[-] cat: ${args[0]}: No such file or directory`;
+            },
+            'grep': (args) => {
+                if (args.length < 2) {
+                    return `[-] grep: missing pattern or file\nUsage: grep [PATTERN] [FILE]`;
+                }
+                const path = resolvePath(args[1]);
+                const parts = path.split('/').filter(p => p);
+                let dir = filesystem;
+                let fileName = parts.pop();
+                for (let part of parts) {
+                    dir = dir['/home/kali']?.contents || dir;
+                    if (dir[part]?.type === 'dir') {
+                        dir = dir[part].contents;
+                    } else {
+                        return `[-] grep: ${args[1]}: No such file or directory`;
+                    }
+                }
+                if (dir[fileName]?.type === 'file') {
+                    return `Found: ${args[0]} in ${args[1]}`;
+                }
+                return `[-] grep: ${args[1]}: No such file or directory`;
+            },
+            'sudo': (args) => {
+                if (!args[0]) {
+                    return `[-] sudo: missing command\nUsage: sudo [COMMAND]`;
+                }
+                if (commands[args[0]]) {
+                    return `[sudo] running as root: ${args[0]}\n${commands[args[0]](args.slice(1))}`;
+                }
+                return `[-] sudo: ${args[0]}: command not found`;
+            },
+            'mkdir': (args) => {
+                if (!args[0]) {
+                    return `[-] mkdir: missing operand\nUsage: mkdir [DIRECTORY]`;
+                }
+                const path = resolvePath(args[0]);
+                const parts = path.split('/').filter(p => p);
+                let dir = filesystem;
+                let newDir = parts.pop();
+                for (let part of parts) {
+                    dir = dir['/home/kali']?.contents || dir;
+                    if (dir[part]?.type === 'dir') {
+                        dir = dir[part].contents;
+                    } else {
+                        return `[-] mkdir: cannot create directory '${args[0]}': No such file or directory`;
+                    }
+                }
+                if (dir[newDir]) {
+                    return `[-] mkdir: cannot create directory '${args[0]}': File exists`;
+                }
+                dir[newDir] = { type: 'dir', contents: {} };
+                return '';
+            },
+            'rm': (args) => {
+                if (!args[0]) {
+                    return `[-] rm: missing operand\nUsage: rm [FILE/DIRECTORY]`;
+                }
+                const path = resolvePath(args[0]);
+                const parts = path.split('/').filter(p => p);
+                let dir = filesystem;
+                let target = parts.pop();
+                for (let part of parts) {
+                    dir = dir['/home/kali']?.contents || dir;
+                    if (dir[part]?.type === 'dir') {
+                        dir = dir[part].contents;
+                    } else {
+                        return `[-] rm: cannot remove '${args[0]}': No such file or directory`;
+                    }
+                }
+                if (dir[target]) {
+                    delete dir[target];
+                    return '';
+                }
+                return `[-] rm: cannot remove '${args[0]}': No such file or directory`;
+            },
+            'touch': (args) => {
+                if (!args[0]) {
+                    return `[-] touch: missing file operand\nUsage: touch [FILE]`;
+                }
+                const path = resolvePath(args[0]);
+                const parts = path.split('/').filter(p => p);
+                let dir = filesystem;
+                let fileName = parts.pop();
+                for (let part of parts) {
+                    dir = dir['/home/kali']?.contents || dir;
+                    if (dir[part]?.type === 'dir') {
+                        dir = dir[part].contents;
+                    } else {
+                        return `[-] touch: cannot touch '${args[0]}': No such file or directory`;
+                    }
+                }
+                if (dir[fileName]) {
+                    return '';
+                }
+                dir[fileName] = { type: 'file', contents: '' };
+                return '';
+            },
+            'mv': (args) => {
+                if (args.length < 2) {
+                    return `[-] mv: missing source or destination\nUsage: mv [SOURCE] [DESTINATION]`;
+                }
+                const srcPath = resolvePath(args[0]);
+                const destPath = resolvePath(args[1]);
+                const srcParts = srcPath.split('/').filter(p => p);
+                const destParts = destPath.split('/').filter(p => p);
+                let srcDir = filesystem;
+                let destDir = filesystem;
+                let srcName = srcParts.pop();
+                let destName = destParts.pop();
+                for (let part of srcParts) {
+                    srcDir = srcDir['/home/kali']?.contents || srcDir;
+                    if (srcDir[part]?.type === 'dir') {
+                        srcDir = srcDir[part].contents;
+                    } else {
+                        return `[-] mv: cannot move '${args[0]}': No such file or directory`;
+                    }
+                }
+                for (let part of destParts) {
+                    destDir = destDir['/home/kali']?.contents || destDir;
+                    if (destDir[part]?.type === 'dir') {
+                        destDir = destDir[part].contents;
+                    } else {
+                        return `[-] mv: cannot move to '${args[1]}': No such file or directory`;
+                    }
+                }
+                if (srcDir[srcName]) {
+                    destDir[destName] = srcDir[srcName];
+                    delete srcDir[srcName];
+                    return '';
+                }
+                return `[-] mv: cannot move '${args[0]}': No such file or directory`;
+            },
+            'cp': (args) => {
+                if (args.length < 2) {
+                    return `[-] cp: missing source or destination\nUsage: cp [SOURCE] [DESTINATION]`;
+                }
+                const srcPath = resolvePath(args[0]);
+                const destPath = resolvePath(args[1]);
+                const srcParts = srcPath.split('/').filter(p => p);
+                const destParts = destPath.split('/').filter(p => p);
+                let srcDir = filesystem;
+                let destDir = filesystem;
+                let srcName = srcParts.pop();
+                let destName = destParts.pop();
+                for (let part of srcParts) {
+                    srcDir = srcDir['/home/kali']?.contents || srcDir;
+                    if (srcDir[part]?.type === 'dir') {
+                        srcDir = srcDir[part].contents;
+                    } else {
+                        return `[-] cp: cannot copy '${args[0]}': No such file or directory`;
+                    }
+                }
+                for (let part of destParts) {
+                    destDir = destDir['/home/kali']?.contents || destDir;
+                    if (destDir[part]?.type === 'dir') {
+                        destDir = destDir[part].contents;
+                    } else {
+                        return `[-] cp: cannot copy to '${args[1]}': No such file or directory`;
+                    }
+                }
+                if (srcDir[srcName]) {
+                    destDir[destName] = JSON.parse(JSON.stringify(srcDir[srcName])); // Deep copy
+                    return '';
+                }
+                return `[-] cp: cannot copy '${args[0]}': No such file or directory`;
+            },
+            'man': (args) => {
+                if (!args[0]) {
+                    return `[-] man: missing command\nUsage: man [COMMAND]`;
+                }
+                if (commands[args[0]]) {
+                    return `MANUAL FOR ${args[0].toUpperCase()}
+NAME
+  ${args[0]} - Simulated command in Kali Linux emulator
+
+DESCRIPTION
+  This is a simulated version of the ${args[0]} command.
+  Use 'help' for more details or try the command directly.`;
+                }
+                return `[-] man: no manual entry for ${args[0]}`;
+            },
+            'nmap': (args) => {
+                if (!args[0]) {
+                    return `[-] nmap: missing target\nUsage: nmap [Scan Type] [Options] {target specification}\nExample: nmap 192.168.1.1`;
+                }
+                return `Starting Nmap 7.94 ( https://nmap.org ) at ${new Date().toISOString()}
+Nmap scan report for ${args[0]}
+Host is up (0.0023s latency).
+PORT    STATE  SERVICE
+22/tcp  open   ssh
+80/tcp  open   http
+443/tcp open   https
+Nmap done: 1 IP address (1 host up) scanned in 0.06 seconds`;
+            },
+            'metasploit': () => {
+                window.open('https://www.metasploit.com/', '_blank');
+                return `Launching Metasploit Framework...\nOpening Metasploit documentation in new tab.`;
+            },
+            'hydra': (args) => {
+                if (!args[0]) {
+                    return `[-] hydra: missing parameters\nUsage: hydra [options] target service`;
+                }
+                return `hydra v9.5 (c) 2023 by van Hauser/THC
+Hydra starting password attack on ${args[0]}...
+[INFO] Simulated attack complete. Use real Hydra in a Kali environment.`;
+            },
+            'sqlmap': (args) => {
+                if (!args[0]) {
+                    return `[-] sqlmap: missing URL\nUsage: sqlmap -u URL [options]`;
+                }
+                return `sqlmap/1.9.9 - automated tool for SQL injection
+[*] starting at ${new Date().toISOString()}
+[INFO] testing URL: ${args[0]}
+[INFO] Simulated SQL injection test complete. Use real sqlmap in Kali.`;
+            },
+            'aircrack-ng': (args) => {
+                if (!args[0]) {
+                    return `[-] aircrack-ng: missing parameters\nUsage: aircrack-ng [options] <capture file>`;
+                }
+                return `Aircrack-ng 1.7
+[00:00:01] Tested 1000 keys (got 100 IVs)
+KEY FOUND! [ Simulated:WiFi:Key123 ]
+Use real aircrack-ng in a Kali environment.`;
             },
             'attacks': () => {
                 window.open('https://pbmundas.github.io/know-attacks-history/', '_blank');
@@ -327,10 +627,9 @@ drwxr-xr-x  2 kali kali  4096 Sep 12 09:00 Downloads`;
         document.addEventListener('mousemove', (e) => {
             if (isDragging) {
                 const containerRect = document.getElementById('container').getBoundingClientRect();
-                const minWidth = 200; // Minimum width for both containers
+                const minWidth = 200;
                 let newTerminalWidth = e.clientX - containerRect.left;
 
-                // Constrain terminal width
                 if (newTerminalWidth < minWidth) newTerminalWidth = minWidth;
                 if (newTerminalWidth > containerRect.width - minWidth) newTerminalWidth = containerRect.width - minWidth;
 
@@ -353,7 +652,7 @@ drwxr-xr-x  2 kali kali  4096 Sep 12 09:00 Downloads`;
                 if (cmdLine) {
                     commandHistory.push(cmdLine);
                     historyIndex = commandHistory.length;
-                    appendToOutput(`┌──(kali㉿kali)-[~]\n└─$ ${cmdLine}`);
+                    appendToOutput(`┌──(kali㉿kali)-[${currentPath.replace('/home/kali', '~')}]\n└─$ ${cmdLine}`);
                     const parts = cmdLine.split(/\s+/);
                     const cmd = parts[0].toLowerCase();
                     const args = parts.slice(1);
@@ -412,7 +711,6 @@ drwxr-xr-x  2 kali kali  4096 Sep 12 09:00 Downloads`;
         window.addEventListener('resize', () => {
             document.getElementById('terminal-container').style.height = '100vh';
             document.getElementById('image-container').style.height = '100vh';
-            // Adjust divider position on window resize
             const terminalWidth = terminalContainer.offsetWidth;
             const containerWidth = document.getElementById('container').offsetWidth;
             divider.style.left = `${(terminalWidth / containerWidth) * 100}%`;
