@@ -149,6 +149,10 @@ Videos/`;
                 return ''; // No output if not exiting
             },
             // Link-based commands (automatically open in new tab; replace URLs with your actual links)
+            'attacks': () => {
+                window.open('https://pbmundas.github.io/know-attacks-history/', '_blank');
+                return `Opening Attack Navigator in new tab...`;
+            },
             'blog': () => {
                 window.open('https://readsecurity.wordpress.com', '_blank');
                 return `Opening blog in new tab...`;
