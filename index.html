@@ -236,7 +236,10 @@ drwxr-xr-x  2 kali kali  4096 Sep 12 09:00 Downloads`;
                 return `Desktop  Documents  Downloads  Music  Pictures  Templates  Videos`;
             },
             'pwd': () => '/home/kali',
-            'whoami': () => 'kali',
+            'whoami': () => {
+                window.open('https://www.linkedin.com/in/prasannamundas/', '_blank');
+                return ``;
+            },
             'echo': (args) => args.join(' '),
             'clear': () => {
                 document.getElementById('output').innerHTML = '';
