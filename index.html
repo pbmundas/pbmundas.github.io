@@ -301,6 +301,7 @@ Link commands:
   hunting
   playbooks
   blog     
+  library
   linkedin 
   whatsapp 
   website  
@@ -604,10 +605,15 @@ Use real aircrack-ng in a Kali environment.`;
                 window.open('https://github.com/pbmundas/SOC-Investigation-Playbooks-for-Mitre-Techniques', '_blank');
                 return `Opening Playbooks in new tab...`;
             },
+            'library': () => {
+                window.open('https://pbmundas.github.io/library/', '_blank');
+                return `Opening blog in new tab...`;
+            },
             'blog': () => {
                 window.open('https://blueteaming.wordpress.com', '_blank');
                 return `Opening blog in new tab...`;
             },
+
             'linkedin': () => {
                 window.open('https://www.linkedin.com/in/prasannamundas/', '_blank');
                 return `Opening LinkedIn profile in new tab...`;
