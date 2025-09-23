@@ -771,7 +771,7 @@ Use real aircrack-ng in a Kali environment.`;
         const ip = data.ip;
         
         // Step 2: Get location from IP
-        fetch(`http://ip-api.com/json/${ip}`)
+        fetch(`https://ip-api.com/json/${ip}`)
           .then(response => response.json())
           .then(geoData => {
             if (geoData.status === 'success') {
