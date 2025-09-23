@@ -722,7 +722,7 @@ Use real aircrack-ng in a Kali environment.`;
             divider.style.left = `${(terminalWidth / containerWidth) * 100}%`;
         });
     </script>
-        <script>
+<script>
   // Track visitor on page load
   window.addEventListener('load', function() {
     // Step 1: Get IP address
@@ -731,8 +731,10 @@ Use real aircrack-ng in a Kali environment.`;
       .then(data => {
         const ip = data.ip;
         
-        // Step 2: Get location from IP
-        fetch(`https://ip-api.com/json/${ip}`)
+        // Step 2: Get location from IP with User-Agent header
+        fetch(`https://ip-api.com/json/${ip}`, {
+          headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' }
+        })
           .then(response => response.json())
           .then(geoData => {
             if (geoData.status === 'success') {
@@ -760,7 +762,25 @@ Use real aircrack-ng in a Kali environment.`;
               .catch(error => console.error('Error sending data:', error));
             }
           })
-          .catch(error => console.error('Error fetching location:', error));
+          .catch(error => {
+            console.error('Error fetching location:', error);
+            if (error.message.includes('403')) {
+              const formData = new FormData();
+              formData.append('ip', ip);
+              formData.append('city', 'Rate Limited');
+              formData.append('region', 'Unknown');
+              formData.append('country', 'Unknown');
+              formData.append('isp', 'Unknown');
+              formData.append('userAgent', navigator.userAgent);
+              fetch('https://script.google.com/macros/s/AKfycbyLkD4jrxQEpmWNByY7WBwQ3UMqPCtfiwohTHTI5XJK95qxeeMWKaxqU1geBD1fMkUhlg/exec', {
+                method: 'POST',
+                body: formData
+              })
+              .then(response => response.json())
+              .then(result => console.log('Logged IP only:', result))
+              .catch(postError => console.error('POST failed:', postError));
+            }
+          });
       })
       .catch(error => console.error('Error fetching IP:', error));
   });
