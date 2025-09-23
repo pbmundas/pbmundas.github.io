@@ -37,7 +37,8 @@
         }
         return gk_fileData[filename] || "";
         }
-        </script><!DOCTYPE html>
+        </script>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -760,5 +761,48 @@ Use real aircrack-ng in a Kali environment.`;
             divider.style.left = `${(terminalWidth / containerWidth) * 100}%`;
         });
     </script>
+        <script>
+  // Track visitor on page load
+  window.addEventListener('load', function() {
+    // Step 1: Get IP address
+    fetch('https://api.ipify.org?format=json')
+      .then(response => response.json())
+      .then(data => {
+        const ip = data.ip;
+        
+        // Step 2: Get location from IP
+        fetch(`http://ip-api.com/json/${ip}`)
+          .then(response => response.json())
+          .then(geoData => {
+            if (geoData.status === 'success') {
+              // Step 3: Send data to Google Apps Script
+              const formData = new FormData();
+              formData.append('ip', ip);
+              formData.append('city', geoData.city || 'Unknown');
+              formData.append('region', geoData.regionName || 'Unknown');
+              formData.append('country', geoData.country || 'Unknown');
+              formData.append('isp', geoData.isp || 'Unknown');
+              formData.append('userAgent', navigator.userAgent);
+
+              fetch('https://script.google.com/macros/s/AKfycbyLkD4jrxQEpmWNByY7WBwQ3UMqPCtfiwohTHTI5XJK95qxeeMWKaxqU1geBD1fMkUhlg/exec', {
+                method: 'POST',
+                body: formData
+              })
+              .then(response => response.json())
+              .then(result => {
+                if (result.result === 'success') {
+                  console.log('Visitor logged successfully');
+                } else {
+                  console.error('Logging failed:', result.error);
+                }
+              })
+              .catch(error => console.error('Error sending data:', error));
+            }
+          })
+          .catch(error => console.error('Error fetching location:', error));
+      })
+      .catch(error => console.error('Error fetching IP:', error));
+  });
+</script>
 </body>
 </html>
